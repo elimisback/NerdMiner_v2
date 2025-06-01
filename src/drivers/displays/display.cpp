@@ -60,6 +60,10 @@ DisplayDriver *currentDisplayDriver = &m5stickCPlusDriver;
 DisplayDriver *currentDisplayDriver = &t_hmiDisplayDriver;
 #endif
 
+#ifdef SUNTON_DISPLAY
+DisplayDriver *currentDisplayDriver = &suntonDisplayDriver;
+#endif
+
 
 // Initialize the display
 void initDisplay()
