@@ -3,11 +3,18 @@
 #ifdef SUNTON_DISPLAY
 
 #define LGFX_USE_V1
+#include <WiFi.h>
+#include <Wire.h>
+#include <SPI.h>
 #include <LovyanGFX.hpp>
+#include <lgfx_user/LGFX_Sunton_ESP32-8048S070.h>
 
-#include <lgfx/v1/platforms/esp32s3/Panel_RGB.hpp>
-#include <lgfx/v1/platforms/esp32s3/Bus_RGB.hpp>
-#include <driver/i2c.h>
+#include "monitor.h"
+#include "drivers/storage/storage.h"
+#include "wManager.h"
+
+extern monitor_data mMonitor;
+extern TSettings Settings;
 
 class LGFX : public lgfx::LGFX_Device
 {
@@ -110,5 +117,102 @@ public:
     setPanel(&_panel_instance);
   }
 };
+void suntonDisplay_AlternateScreenState(void)
+{
+}
 
+void suntonDisplay_AlternateRotation(void)
+{
+}
+
+static unsigned long ulTime = millis() - 100000;
+
+void suntonDisplay_NoScreen(unsigned long mElapsed)
+{
+  mining_data data = getMiningData(mElapsed);
+
+  // Print hashrate to serial
+  Serial.printf(">>> Completed %s share(s), %s Khashes, avg. hashrate %s KH/s\n",
+                data.completedShares.c_str(), data.totalKHashes.c_str(), data.currentHashRate.c_str());
+  //Serial.printf(">>> Temperature: %s\n", data.temp.c_str());
+
+  lv_label_set_text(ui_lblhashrate, data.currentHashRate.c_str());
+  lv_bar_set_value(ui_barhashrate, data.currentHashRate.toInt(), LV_ANIM_ON);
+  lv_label_set_text(ui_lblvalid, data.valids.c_str());
+  lv_label_set_text(ui_lbltemplates, data.templates.c_str());
+  lv_label_set_text(ui_lbltotalhashrate, data.totalKHashes.c_str());
+  lv_label_set_text(ui_lblbestdiff, data.bestDiff.c_str());
+  lv_label_set_text(ui_lblshares32, data.completedShares.c_str());
+  lv_label_set_text(ui_lblclock, data.timeMining.c_str());
+  lv_label_set_text(ui_lbltemperature, data.temp.c_str());
+
+  lv_label_set_text(ui_lblclock2, data.currentTime.c_str());
+
+  lv_label_set_text(ui_lblIp, WiFi.localIP().toString().c_str());
+  lv_label_set_text(ui_lblAddress, String(Settings.BtcWallet).c_str());
+
+  if(millis() - ulTime > 1000 * 60) {
+    ulTime = millis();
+  
+    coin_data cdata = getCoinData(mElapsed);
+
+    lv_label_set_text(ui_lblPrice, cdata.btcPrice.c_str());
+    lv_label_set_text(ui_lblGlobalHashrate, cdata.globalHashRate.c_str());
+    lv_label_set_text(ui_lblDifficulty, cdata.netwrokDifficulty.c_str());
+    lv_bar_set_value(ui_barhalving, cdata.progressPercent, LV_ANIM_ON);
+    lv_label_set_text(ui_lblHeight2, cdata.blockHeight.c_str());
+
+    pool_data pdata = getPoolData();
+
+    lv_label_set_text(ui_lblWorkers, String(pdata.workersCount).c_str());
+    lv_label_set_text(ui_lblMaxDifficulty, pdata.bestDifficulty.c_str());
+    lv_label_set_text(ui_lblTotHashrate, pdata.workersHash.c_str());
+  }
+}
+
+void suntonDisplay_LoadingScreen(void)
+{
+  Serial.println("Initializing...");
+  Serial.print("Firmware Version: ");
+  Serial.println(AUTO_VERSION);
+  lv_label_set_text(ui_lblssid, "HanSoloAP");
+  lv_label_set_text(ui_lblpassword, "MineYourCoins");
+  lv_label_set_text(ui_lblversion, AUTO_VERSION);
+  lv_label_set_text(ui_lblversion2, AUTO_VERSION);
+
+  lv_label_set_text(ui_lblPool, (String(Settings.PoolAddress)+":"+String(Settings.PoolPort)).c_str());
+
+  _ui_screen_change(&ui_HomeScreen, LV_SCR_LOAD_ANIM_FADE_ON, 2000, 0, &ui_HomeScreen_screen_init);
+}
+
+void suntonDisplay_SetupScreen(void)
+{
+  Serial.println("Setup...");
+}
+
+void suntonDisplay_DoLedStuff(unsigned long frame)
+{
+  // we will use led function to update lvgl
+  lv_timer_handler();
+}
+
+void suntonDisplay_AnimateCurrentScreen(unsigned long frame)
+{
+}
+
+CyclicScreenFunction suntonDisplayCyclicScreens[] = {suntonDisplay_NoScreen};
+
+DisplayDriver suntonDisplayDriver{
+    suntonDisplay_Init,
+    suntonDisplay_AlternateScreenState,
+    suntonDisplay_AlternateRotation,
+    suntonDisplay_LoadingScreen,
+    suntonDisplay_SetupScreen,
+    suntonDisplayCyclicScreens,
+    suntonDisplay_AnimateCurrentScreen,
+    suntonDisplay_DoLedStuff,
+    SCREENS_ARRAY_SIZE(suntonDisplayCyclicScreens),
+    0,
+    WIDTH,
+    HEIGHT};
 #endif
