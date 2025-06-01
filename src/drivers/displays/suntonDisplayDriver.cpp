@@ -1,3 +1,7 @@
+#include "displayDriver.h"
+
+#ifdef SUNTON_DISPLAY
+
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
 
@@ -106,3 +110,5 @@ public:
     setPanel(&_panel_instance);
   }
 };
+
+#endif
