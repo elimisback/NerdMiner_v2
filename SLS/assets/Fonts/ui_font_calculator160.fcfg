@@ -1,0 +1,16 @@
+{
+  "codename": "calculator160",
+  "ttf_path": "/assets/Fonts/Calculator.ttf",
+  "bin_path": "/assets/Fonts\\ui_font_calculator160.bin",
+  "c_path": "/assets/Fonts\\ui_font_calculator160.c",
+  "cfg_path": "/assets/Fonts\\ui_font_calculator160.fcfg",
+  "size": 160,
+  "bpp": 1,
+  "letters": 0,
+  "ranges": [
+    "0x20-0x7f"
+  ],
+  "symbols": "",
+  "customparams": "--no-compress --no-prefilter",
+  "uploaded": false
+}

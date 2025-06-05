@@ -1,0 +1,16 @@
+{
+  "codename": "star60",
+  "ttf_path": "/assets/Fonts/star_jedi/starjedi/Starjedi.ttf",
+  "bin_path": "/assets/Fonts/star_jedi/starjedi\\ui_font_star60.bin",
+  "c_path": "/assets/Fonts/star_jedi/starjedi\\ui_font_star60.c",
+  "cfg_path": "/assets/Fonts/star_jedi/starjedi\\ui_font_star60.fcfg",
+  "size": 60,
+  "bpp": 1,
+  "letters": 0,
+  "ranges": [
+    "0x20-0x7f"
+  ],
+  "symbols": "",
+  "customparams": "--no-compress --no-prefilter",
+  "uploaded": false
+}

@@ -12,6 +12,7 @@
 #include "monitor.h"
 #include "drivers/storage/storage.h"
 #include "wManager.h"
+#include "ui.h"
 
 extern monitor_data mMonitor;
 extern TSettings Settings;
